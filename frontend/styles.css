@@ -10,9 +10,13 @@ body {
 }
 
 .container {
-  max-width: 760px;
+  max-width: 1100px;
   margin: 32px auto;
-  padding: 0 16px;
+  padding: 0 18px 24px;
+}
+
+.page-header {
+  margin-bottom: 16px;
 }
 
 h1 {
@@ -24,12 +28,28 @@ h1 {
   color: #4b5563;
 }
 
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .card {
   background: #ffffff;
-  padding: 16px;
+  padding: 18px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-top: 16px;
+}
+
+.card-wide {
+  grid-column: 1 / -1;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 form {
@@ -45,6 +65,13 @@ input {
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
+}
+
+select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
 }
 
 button {
@@ -66,8 +93,21 @@ button:hover {
 #pharmacy-list,
 #pharmacy-meds-result {
   margin-top: 12px;
-  white-space: pre-wrap;
   font-size: 14px;
+}
+
+.message-box {
+  min-height: 20px;
+}
+
+.message-success {
+  color: #065f46;
+  font-weight: 600;
+}
+
+.message-error {
+  color: #b91c1c;
+  font-weight: 600;
 }
 
 table {
@@ -95,4 +135,10 @@ th {
 .status-out {
   color: #b91c1c;
   font-weight: 600;
+}
+
+@media (max-width: 820px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
 }

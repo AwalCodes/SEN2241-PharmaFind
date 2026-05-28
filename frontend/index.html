@@ -8,57 +8,57 @@
   </head>
   <body>
     <main class="container">
-      <h1>Pharma-Find</h1>
-      <p class="subtitle">Search medicine availability in nearby pharmacies.</p>
+      <header class="page-header">
+        <h1>Pharma-Find</h1>
+        <p class="subtitle">Search medicine availability and manage stock updates.</p>
+      </header>
 
-      <section class="card">
-        <h2>All Pharmacies</h2>
-        <button id="refresh-btn" type="button">Refresh List</button>
-        <div id="pharmacy-list"></div>
-      </section>
+      <div class="grid-layout">
+        <section class="card card-wide">
+          <div class="card-top">
+            <h2>All Pharmacies</h2>
+            <button id="refresh-btn" type="button">Refresh</button>
+          </div>
+          <div id="pharmacy-list"></div>
+        </section>
 
-      <section class="card">
-        <h2>Search Medication</h2>
-        <form id="search-form">
-          <label for="med-name">Medication name</label>
-          <input id="med-name" type="text" placeholder="Paracetamol" required />
-          <button type="submit">Search</button>
-        </form>
-        <div id="search-result"></div>
-      </section>
+        <section class="card">
+          <h2>Search Medication</h2>
+          <form id="search-form">
+            <label for="med-name">Medication name</label>
+            <input id="med-name" type="text" placeholder="Paracetamol" required />
+            <button type="submit">Search</button>
+          </form>
+          <div id="search-result"></div>
+        </section>
 
-      <section class="card">
-        <h2>Update Stock (Pharmacist)</h2>
-        <form id="stock-form">
-          <label for="pharmacy-id">Pharmacy ID</label>
-          <input id="pharmacy-id" type="number" min="1" placeholder="1" required />
+        <section class="card">
+          <h2>Update Stock (Pharmacist)</h2>
+          <form id="stock-form">
+            <label for="stock-pharmacy-id">Pharmacy</label>
+            <select id="stock-pharmacy-id" required></select>
 
-          <label for="stock-med-name">Medication name</label>
-          <input id="stock-med-name" type="text" placeholder="Paracetamol" required />
+            <label for="stock-med-name">Medication</label>
+            <select id="stock-med-name" required></select>
 
-          <label for="new-qty">New quantity</label>
-          <input id="new-qty" type="number" min="0" placeholder="20" required />
+            <label for="new-qty">New quantity</label>
+            <input id="new-qty" type="number" min="0" value="20" required />
 
-          <button type="submit">Update Stock</button>
-        </form>
-        <div id="stock-result"></div>
-      </section>
+            <button type="submit">Update Stock</button>
+          </form>
+          <div id="stock-result" class="message-box"></div>
+        </section>
 
-      <section class="card">
-        <h2>Medications in Selected Pharmacy</h2>
-        <form id="view-meds-form">
-          <label for="view-pharmacy-id">Pharmacy ID</label>
-          <input
-            id="view-pharmacy-id"
-            type="number"
-            min="1"
-            placeholder="1"
-            required
-          />
-          <button type="submit">View Medications</button>
-        </form>
-        <div id="pharmacy-meds-result"></div>
-      </section>
+        <section class="card card-wide">
+          <h2>Medications in Selected Pharmacy</h2>
+          <form id="view-meds-form">
+            <label for="view-pharmacy-id">Pharmacy</label>
+            <select id="view-pharmacy-id" required></select>
+            <button type="submit">View Medications</button>
+          </form>
+          <div id="pharmacy-meds-result"></div>
+        </section>
+      </div>
     </main>
 
     <script src="/frontend/app.js"></script>
