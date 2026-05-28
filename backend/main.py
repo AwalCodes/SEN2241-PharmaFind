@@ -91,6 +91,36 @@ def get_pharmacies():
     return {"pharmacies": items}
 
 
+@app.get("/api/pharmacies/{pharmacy_id}/medications")
+def get_pharmacy_medications(pharmacy_id: int):
+    """Return all medications for one pharmacy."""
+    selected_pharmacy = None
+    for pharmacy in pharmacies:
+        if pharmacy.pharmacy_id == pharmacy_id:
+            selected_pharmacy = pharmacy
+            break
+
+    if selected_pharmacy is None:
+        raise HTTPException(status_code=404, detail="Pharmacy not found")
+
+    meds = []
+    for medication in selected_pharmacy.medications:
+        meds.append(
+            {
+                "med_id": medication.med_id,
+                "name": medication.name,
+                "quantity": medication.quantity,
+                "in_stock": medication.quantity > 0,
+            }
+        )
+
+    return {
+        "pharmacy_id": selected_pharmacy.pharmacy_id,
+        "pharmacy_name": selected_pharmacy.name,
+        "medications": meds,
+    }
+
+
 @app.post("/api/pharmacies/{pharmacy_id}/stock")
 def update_stock(pharmacy_id: int, payload: StockUpdateRequest):
     """

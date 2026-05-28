@@ -35,6 +35,14 @@ def test_get_pharmacies():
     assert len(data["pharmacies"]) >= 1
 
 
+def test_get_pharmacy_medications():
+    response = client.get("/api/pharmacies/1/medications")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["pharmacy_id"] == 1
+    assert len(data["medications"]) >= 1
+
+
 def test_update_stock_success():
     response = client.post(
         "/api/pharmacies/1/stock",

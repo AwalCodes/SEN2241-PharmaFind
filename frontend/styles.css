@@ -37,6 +37,10 @@ form {
   gap: 8px;
 }
 
+label {
+  font-weight: 600;
+}
+
 input {
   padding: 10px;
   border-radius: 8px;
@@ -58,8 +62,37 @@ button:hover {
 }
 
 #search-result,
-#stock-result {
+#stock-result,
+#pharmacy-list,
+#pharmacy-meds-result {
   margin-top: 12px;
   white-space: pre-wrap;
   font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background: #f9fafb;
+}
+
+.status-in {
+  color: #047857;
+  font-weight: 600;
+}
+
+.status-out {
+  color: #b91c1c;
+  font-weight: 600;
 }

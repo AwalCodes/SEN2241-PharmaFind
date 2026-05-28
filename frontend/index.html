@@ -4,12 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pharma-Find Frontend</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="/frontend/styles.css" />
   </head>
   <body>
     <main class="container">
       <h1>Pharma-Find</h1>
       <p class="subtitle">Search medicine availability in nearby pharmacies.</p>
+
+      <section class="card">
+        <h2>All Pharmacies</h2>
+        <button id="refresh-btn" type="button">Refresh List</button>
+        <div id="pharmacy-list"></div>
+      </section>
 
       <section class="card">
         <h2>Search Medication</h2>
@@ -37,8 +43,24 @@
         </form>
         <div id="stock-result"></div>
       </section>
+
+      <section class="card">
+        <h2>Medications in Selected Pharmacy</h2>
+        <form id="view-meds-form">
+          <label for="view-pharmacy-id">Pharmacy ID</label>
+          <input
+            id="view-pharmacy-id"
+            type="number"
+            min="1"
+            placeholder="1"
+            required
+          />
+          <button type="submit">View Medications</button>
+        </form>
+        <div id="pharmacy-meds-result"></div>
+      </section>
     </main>
 
-    <script src="./app.js"></script>
+    <script src="/frontend/app.js"></script>
   </body>
 </html>
