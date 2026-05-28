@@ -19,6 +19,12 @@ body {
   margin-bottom: 16px;
 }
 
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 h1 {
   margin-bottom: 4px;
 }
@@ -47,11 +53,6 @@ h1 {
 
 .card-wide {
   grid-column: 1 / -1;
-}
-
-.login-card {
-  max-width: 520px;
-  margin: 0 auto 14px;
 }
 
 .card-top {
@@ -122,6 +123,32 @@ button:hover {
 .hint-text {
   margin-top: 0;
   color: #4b5563;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-content {
+  width: min(450px, 90vw);
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.secondary-btn {
+  background: #6b7280;
 }
 
 table {

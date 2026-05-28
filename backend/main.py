@@ -1,6 +1,7 @@
 from pathlib import Path
+from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -58,6 +59,7 @@ pharmacies = [pharmacy_a, pharmacy_b]
 pharmacist_user = Pharmacist(1, "Demo Pharmacist", "pharmacist@pharmafind.com", "CityCare Pharmacy")
 pharmacist_username = "pharmacist"
 pharmacist_password = "pharma123"
+pharmacist_tokens: set[str] = set()
 
 
 def get_next_pharmacy_id() -> int:
@@ -131,18 +133,28 @@ def pharmacist_login(payload: PharmacistLoginRequest):
     if payload.username != pharmacist_username or payload.password != pharmacist_password:
         raise HTTPException(status_code=401, detail="Invalid pharmacist credentials")
 
+    token = str(uuid4())
+    pharmacist_tokens.add(token)
+
     return {
         "message": "Login successful",
         "pharmacist_name": pharmacist_user.name,
         "role": pharmacist_user.get_role(),
+        "token": token,
     }
 
 
 @app.post("/api/pharmacies")
-def add_pharmacy(payload: AddPharmacyRequest):
+def add_pharmacy(
+    payload: AddPharmacyRequest,
+    pharmacist_token: str | None = Header(default=None, alias="X-Pharmacist-Token"),
+):
     """
     Add a new pharmacy and one initial medication.
     """
+    if pharmacist_token is None or pharmacist_token not in pharmacist_tokens:
+        raise HTTPException(status_code=401, detail="Pharmacist login required")
+
     if payload.quantity < 0:
         raise HTTPException(status_code=400, detail="Quantity cannot be negative")
 
@@ -200,11 +212,18 @@ def get_pharmacy_medications(pharmacy_id: int):
 
 
 @app.post("/api/pharmacies/{pharmacy_id}/stock")
-def update_stock(pharmacy_id: int, payload: StockUpdateRequest):
+def update_stock(
+    pharmacy_id: int,
+    payload: StockUpdateRequest,
+    pharmacist_token: str | None = Header(default=None, alias="X-Pharmacist-Token"),
+):
     """
     Update medication stock quantity for one pharmacy.
     This is used by pharmacist-side stock management.
     """
+    if pharmacist_token is None or pharmacist_token not in pharmacist_tokens:
+        raise HTTPException(status_code=401, detail="Pharmacist login required")
+
     if payload.new_quantity < 0:
         raise HTTPException(status_code=400, detail="Quantity cannot be negative")
 

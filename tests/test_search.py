@@ -43,9 +43,16 @@ def test_pharmacist_login_success():
     assert response.status_code == 200
     data = response.json()
     assert data["role"] == "Pharmacist"
+    assert "token" in data
 
 
 def test_add_pharmacy_success():
+    login_response = client.post(
+        "/api/pharmacist/login",
+        json={"username": "pharmacist", "password": "pharma123"},
+    )
+    token = login_response.json()["token"]
+
     response = client.post(
         "/api/pharmacies",
         json={
@@ -54,6 +61,7 @@ def test_add_pharmacy_success():
             "medication_name": "Vitamin C",
             "quantity": 15,
         },
+        headers={"X-Pharmacist-Token": token},
     )
     assert response.status_code == 200
     data = response.json()
@@ -70,9 +78,16 @@ def test_get_pharmacy_medications():
 
 
 def test_update_stock_success():
+    login_response = client.post(
+        "/api/pharmacist/login",
+        json={"username": "pharmacist", "password": "pharma123"},
+    )
+    token = login_response.json()["token"]
+
     response = client.post(
         "/api/pharmacies/1/stock",
         json={"medication_name": "Paracetamol", "new_quantity": 30},
+        headers={"X-Pharmacist-Token": token},
     )
     assert response.status_code == 200
     data = response.json()
@@ -81,16 +96,38 @@ def test_update_stock_success():
 
 
 def test_update_stock_pharmacy_not_found():
+    login_response = client.post(
+        "/api/pharmacist/login",
+        json={"username": "pharmacist", "password": "pharma123"},
+    )
+    token = login_response.json()["token"]
+
     response = client.post(
         "/api/pharmacies/999/stock",
         json={"medication_name": "Paracetamol", "new_quantity": 10},
+        headers={"X-Pharmacist-Token": token},
     )
     assert response.status_code == 404
 
 
 def test_update_stock_negative_quantity():
+    login_response = client.post(
+        "/api/pharmacist/login",
+        json={"username": "pharmacist", "password": "pharma123"},
+    )
+    token = login_response.json()["token"]
+
     response = client.post(
         "/api/pharmacies/1/stock",
         json={"medication_name": "Paracetamol", "new_quantity": -1},
+        headers={"X-Pharmacist-Token": token},
     )
     assert response.status_code == 400
+
+
+def test_update_stock_requires_login():
+    response = client.post(
+        "/api/pharmacies/1/stock",
+        json={"medication_name": "Paracetamol", "new_quantity": 10},
+    )
+    assert response.status_code == 401

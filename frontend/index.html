@@ -11,24 +11,30 @@
       <header class="page-header">
         <h1>Pharma-Find</h1>
         <p class="subtitle">Search medicine availability and manage stock updates.</p>
+        <div class="top-actions">
+          <button id="pharmacist-login-btn" type="button">Pharmacist Login</button>
+          <span id="login-status" class="hint-text">Not logged in</span>
+        </div>
       </header>
 
-      <section class="card login-card" id="login-card">
-        <h2>Pharmacist Login</h2>
-        <p class="hint-text">
-          Login required to access pharmacist dashboard.
-        </p>
-        <form id="login-form">
-          <label for="login-username">Username</label>
-          <input id="login-username" type="text" placeholder="pharmacist" required />
-          <label for="login-password">Password</label>
-          <input id="login-password" type="password" placeholder="pharma123" required />
-          <button type="submit">Login</button>
-        </form>
-        <div id="login-result" class="message-box"></div>
-      </section>
+      <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Pharmacist Login</h2>
+          <form id="login-form">
+            <label for="login-username">Username</label>
+            <input id="login-username" type="text" required />
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" required />
+            <div class="modal-actions">
+              <button type="submit">Login</button>
+              <button id="close-login-btn" type="button" class="secondary-btn">Close</button>
+            </div>
+          </form>
+          <div id="login-result" class="message-box"></div>
+        </div>
+      </div>
 
-      <div class="grid-layout hidden" id="dashboard">
+      <div class="grid-layout" id="dashboard">
         <section class="card card-wide">
           <div class="card-top">
             <h2>All Pharmacies</h2>
@@ -49,6 +55,7 @@
 
         <section class="card">
           <h2>Update Stock (Pharmacist)</h2>
+          <p class="hint-text">Login is required for stock updates.</p>
           <form id="stock-form">
             <label for="stock-pharmacy-id">Pharmacy</label>
             <select id="stock-pharmacy-id" required></select>
@@ -66,6 +73,7 @@
 
         <section class="card">
           <h2>Add New Pharmacy</h2>
+          <p class="hint-text">Login is required to add a pharmacy.</p>
           <form id="add-pharmacy-form">
             <label for="new-pharmacy-name">Pharmacy name</label>
             <input id="new-pharmacy-name" type="text" placeholder="NewCare Pharmacy" required />

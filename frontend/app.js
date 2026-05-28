@@ -1,8 +1,10 @@
 const API_BASE = window.location.origin;
 
+const pharmacistLoginBtn = document.getElementById("pharmacist-login-btn");
+const closeLoginBtn = document.getElementById("close-login-btn");
+const loginModal = document.getElementById("login-modal");
+const loginStatus = document.getElementById("login-status");
 const loginForm = document.getElementById("login-form");
-const loginCard = document.getElementById("login-card");
-const dashboard = document.getElementById("dashboard");
 const loginResult = document.getElementById("login-result");
 const searchForm = document.getElementById("search-form");
 const stockForm = document.getElementById("stock-form");
@@ -18,11 +20,17 @@ const addPharmacyResult = document.getElementById("add-pharmacy-result");
 const pharmacyList = document.getElementById("pharmacy-list");
 const pharmacyMedsResult = document.getElementById("pharmacy-meds-result");
 
+let pharmacistToken = null;
+
 function makeStockLabel(quantity) {
-  if (quantity > 0) {
-    return '<span class="status-in">In stock</span>';
-  }
+  if (quantity > 0) return '<span class="status-in">In stock</span>';
   return '<span class="status-out">Out of stock</span>';
+}
+
+function openLoginModal() {
+  loginResult.textContent = "";
+  loginResult.className = "message-box";
+  loginModal.classList.remove("hidden");
 }
 
 async function loadPharmacies() {
@@ -46,15 +54,15 @@ async function loadPharmacies() {
     stockPharmacySelect.innerHTML = "";
     viewPharmacySelect.innerHTML = "";
     for (const pharmacy of data.pharmacies) {
-      const stockOption = document.createElement("option");
-      stockOption.value = pharmacy.pharmacy_id;
-      stockOption.textContent = `${pharmacy.pharmacy_id} - ${pharmacy.name}`;
-      stockPharmacySelect.appendChild(stockOption);
+      const s = document.createElement("option");
+      s.value = pharmacy.pharmacy_id;
+      s.textContent = `${pharmacy.pharmacy_id} - ${pharmacy.name}`;
+      stockPharmacySelect.appendChild(s);
 
-      const viewOption = document.createElement("option");
-      viewOption.value = pharmacy.pharmacy_id;
-      viewOption.textContent = `${pharmacy.pharmacy_id} - ${pharmacy.name}`;
-      viewPharmacySelect.appendChild(viewOption);
+      const v = document.createElement("option");
+      v.value = pharmacy.pharmacy_id;
+      v.textContent = `${pharmacy.pharmacy_id} - ${pharmacy.name}`;
+      viewPharmacySelect.appendChild(v);
     }
 
     await loadStockMedications(stockPharmacySelect.value);
@@ -63,55 +71,13 @@ async function loadPharmacies() {
   }
 }
 
-loginForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const username = document.getElementById("login-username").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  loginResult.textContent = "Checking login...";
-  loginResult.className = "message-box";
-
-  try {
-    const response = await fetch(`${API_BASE}/api/pharmacist/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      loginResult.textContent = data.detail || "Login failed";
-      loginResult.className = "message-box message-error";
-      return;
-    }
-
-    loginResult.textContent = `Welcome ${data.pharmacist_name}`;
-    loginResult.className = "message-box message-success";
-    loginCard.classList.add("hidden");
-    dashboard.classList.remove("hidden");
-    await loadPharmacies();
-  } catch (error) {
-    loginResult.textContent = "Error checking login";
-    loginResult.className = "message-box message-error";
-  }
-});
-
 async function loadStockMedications(pharmacyId) {
   stockMedicationSelect.innerHTML = "";
-  if (!pharmacyId) {
-    return;
-  }
-
+  if (!pharmacyId) return;
   try {
     const response = await fetch(`${API_BASE}/api/pharmacies/${pharmacyId}/medications`);
     const data = await response.json();
-
-    if (!response.ok || !data.medications) {
-      return;
-    }
+    if (!response.ok || !data.medications) return;
 
     for (const med of data.medications) {
       const option = document.createElement("option");
@@ -125,25 +91,47 @@ async function loadStockMedications(pharmacyId) {
   }
 }
 
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const username = document.getElementById("login-username").value.trim();
+  const password = document.getElementById("login-password").value;
+  loginResult.textContent = "Checking login...";
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacist/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      loginResult.textContent = data.detail || "Login failed";
+      loginResult.className = "message-box message-error";
+      return;
+    }
+    pharmacistToken = data.token;
+    loginStatus.textContent = `Logged in as ${data.pharmacist_name}`;
+    loginResult.textContent = "Login successful.";
+    loginResult.className = "message-box message-success";
+    loginModal.classList.add("hidden");
+  } catch (error) {
+    loginResult.textContent = "Error checking login";
+    loginResult.className = "message-box message-error";
+  }
+});
+
 searchForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-
   const medName = document.getElementById("med-name").value.trim();
   if (!medName) return;
 
   searchResult.textContent = "Searching...";
-
   try {
-    const response = await fetch(
-      `${API_BASE}/api/medications/search?name=${encodeURIComponent(medName)}`
-    );
+    const response = await fetch(`${API_BASE}/api/medications/search?name=${encodeURIComponent(medName)}`);
     const data = await response.json();
-
     if (!data.results || data.results.length === 0) {
       searchResult.textContent = `No results found for "${medName}".`;
       return;
     }
-
     let html = "<table><thead><tr><th>Pharmacy</th><th>Address</th><th>Quantity</th><th>Status</th></tr></thead><tbody>";
     for (const item of data.results) {
       html += `<tr><td>${item.pharmacy_name}</td><td>${item.address}</td><td>${item.quantity}</td><td>${makeStockLabel(item.quantity)}</td></tr>`;
@@ -157,33 +145,32 @@ searchForm.addEventListener("submit", async (event) => {
 
 stockForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-
+  if (!pharmacistToken) {
+    stockResult.textContent = "Please login as pharmacist first.";
+    stockResult.className = "message-box message-error";
+    openLoginModal();
+    return;
+  }
   const pharmacyId = stockPharmacySelect.value;
   const medicationName = stockMedicationSelect.value;
   const newQuantity = Number(document.getElementById("new-qty").value);
-
   stockResult.textContent = "Updating...";
-  stockResult.className = "message-box";
 
   try {
     const response = await fetch(`${API_BASE}/api/pharmacies/${pharmacyId}/stock`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Pharmacist-Token": pharmacistToken,
       },
-      body: JSON.stringify({
-        medication_name: medicationName,
-        new_quantity: newQuantity,
-      }),
+      body: JSON.stringify({ medication_name: medicationName, new_quantity: newQuantity }),
     });
-
     const data = await response.json();
     if (!response.ok) {
       stockResult.textContent = data.detail || "Failed to update stock.";
       stockResult.className = "message-box message-error";
       return;
     }
-
     stockResult.textContent = `Stock updated: ${data.medication_name} is now ${data.new_quantity}.`;
     stockResult.className = "message-box message-success";
     await loadPharmacies();
@@ -196,36 +183,34 @@ stockForm.addEventListener("submit", async (event) => {
 
 addPharmacyForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!pharmacistToken) {
+    addPharmacyResult.textContent = "Please login as pharmacist first.";
+    addPharmacyResult.className = "message-box message-error";
+    openLoginModal();
+    return;
+  }
 
   const pharmacy_name = document.getElementById("new-pharmacy-name").value.trim();
   const address = document.getElementById("new-pharmacy-address").value.trim();
   const medication_name = document.getElementById("new-pharmacy-medication").value.trim();
   const quantity = Number(document.getElementById("new-pharmacy-quantity").value);
-
   addPharmacyResult.textContent = "Adding pharmacy...";
-  addPharmacyResult.className = "message-box";
 
   try {
     const response = await fetch(`${API_BASE}/api/pharmacies`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Pharmacist-Token": pharmacistToken,
       },
-      body: JSON.stringify({
-        pharmacy_name,
-        address,
-        medication_name,
-        quantity,
-      }),
+      body: JSON.stringify({ pharmacy_name, address, medication_name, quantity }),
     });
     const data = await response.json();
-
     if (!response.ok) {
       addPharmacyResult.textContent = data.detail || "Failed to add pharmacy";
       addPharmacyResult.className = "message-box message-error";
       return;
     }
-
     addPharmacyResult.textContent = `Added ${data.pharmacy_name} successfully`;
     addPharmacyResult.className = "message-box message-success";
     addPharmacyForm.reset();
@@ -241,21 +226,17 @@ viewMedsForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const pharmacyId = viewPharmacySelect.value;
   pharmacyMedsResult.textContent = "Loading medications...";
-
   try {
     const response = await fetch(`${API_BASE}/api/pharmacies/${pharmacyId}/medications`);
     const data = await response.json();
-
     if (!response.ok) {
       pharmacyMedsResult.textContent = data.detail || "Could not load medications.";
       return;
     }
-
     if (!data.medications || data.medications.length === 0) {
       pharmacyMedsResult.textContent = "No medications in this pharmacy.";
       return;
     }
-
     let html = `<p><strong>${data.pharmacy_name}</strong></p>`;
     html += "<table><thead><tr><th>Name</th><th>Quantity</th><th>Status</th></tr></thead><tbody>";
     for (const med of data.medications) {
@@ -271,5 +252,7 @@ viewMedsForm.addEventListener("submit", async (event) => {
 stockPharmacySelect.addEventListener("change", async () => {
   await loadStockMedications(stockPharmacySelect.value);
 });
-
+pharmacistLoginBtn.addEventListener("click", openLoginModal);
+closeLoginBtn.addEventListener("click", () => loginModal.classList.add("hidden"));
 refreshBtn.addEventListener("click", loadPharmacies);
+loadPharmacies();
