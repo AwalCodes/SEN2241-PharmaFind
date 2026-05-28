@@ -50,3 +50,18 @@ def search_medication(name: str = Query(..., description="Medication name to sea
             )
 
     return {"search": name, "results": results}
+
+
+@app.get("/api/pharmacies")
+def get_pharmacies():
+    """Return all pharmacies (basic route for Swagger demo)."""
+    items = []
+    for pharmacy in pharmacies:
+        items.append(
+            {
+                "pharmacy_id": pharmacy.pharmacy_id,
+                "name": pharmacy.name,
+                "address": pharmacy.address,
+            }
+        )
+    return {"pharmacies": items}
