@@ -24,3 +24,11 @@ def test_search_not_found():
     assert response.status_code == 200
     data = response.json()
     assert data["results"] == []
+
+
+def test_get_pharmacies():
+    response = client.get("/api/pharmacies")
+    assert response.status_code == 200
+    data = response.json()
+    assert "pharmacies" in data
+    assert len(data["pharmacies"]) >= 1
