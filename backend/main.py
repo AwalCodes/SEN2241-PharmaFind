@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel
 
 from backend.models import Medication, Pharmacy
 
@@ -7,6 +8,11 @@ app = FastAPI(
     description="Simple API to search medication availability in pharmacies.",
     version="1.0.0",
 )
+
+
+class StockUpdateRequest(BaseModel):
+    medication_name: str
+    new_quantity: int
 
 
 # In-memory sample data for now (simple for class project step-by-step build).
@@ -65,3 +71,35 @@ def get_pharmacies():
             }
         )
     return {"pharmacies": items}
+
+
+@app.post("/api/pharmacies/{pharmacy_id}/stock")
+def update_stock(pharmacy_id: int, payload: StockUpdateRequest):
+    """
+    Update medication stock quantity for one pharmacy.
+    This is used by pharmacist-side stock management.
+    """
+    if payload.new_quantity < 0:
+        raise HTTPException(status_code=400, detail="Quantity cannot be negative")
+
+    selected_pharmacy = None
+    for pharmacy in pharmacies:
+        if pharmacy.pharmacy_id == pharmacy_id:
+            selected_pharmacy = pharmacy
+            break
+
+    if selected_pharmacy is None:
+        raise HTTPException(status_code=404, detail="Pharmacy not found")
+
+    updated = selected_pharmacy.update_medication_stock(
+        payload.medication_name, payload.new_quantity
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Medication not found in pharmacy")
+
+    return {
+        "message": "Stock updated",
+        "pharmacy_id": selected_pharmacy.pharmacy_id,
+        "medication_name": payload.medication_name,
+        "new_quantity": payload.new_quantity,
+    }

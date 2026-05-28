@@ -162,3 +162,14 @@ class Pharmacy:
             if medication.name.lower() == name.lower():
                 return medication
         return None
+
+    def update_medication_stock(self, medication_name: str, new_quantity: int) -> bool:
+        """
+        Update quantity for a medication.
+        Returns True if medication exists and was updated, otherwise False.
+        """
+        medication = self.find_medication_by_name(medication_name)
+        if medication is None:
+            return False
+        medication.quantity = new_quantity
+        return True
