@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharma-Find Frontend</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Pharma-Find</h1>
+      <p class="subtitle">Search medicine availability in nearby pharmacies.</p>
+
+      <section class="card">
+        <h2>Search Medication</h2>
+        <form id="search-form">
+          <label for="med-name">Medication name</label>
+          <input id="med-name" type="text" placeholder="Paracetamol" required />
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-result"></div>
+      </section>
+
+      <section class="card">
+        <h2>Update Stock (Pharmacist)</h2>
+        <form id="stock-form">
+          <label for="pharmacy-id">Pharmacy ID</label>
+          <input id="pharmacy-id" type="number" min="1" placeholder="1" required />
+
+          <label for="stock-med-name">Medication name</label>
+          <input id="stock-med-name" type="text" placeholder="Paracetamol" required />
+
+          <label for="new-qty">New quantity</label>
+          <input id="new-qty" type="number" min="0" placeholder="20" required />
+
+          <button type="submit">Update Stock</button>
+        </form>
+        <div id="stock-result"></div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
