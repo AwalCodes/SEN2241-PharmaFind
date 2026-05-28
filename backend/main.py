@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from backend.models import Medication, Pharmacy
@@ -9,6 +13,11 @@ app = FastAPI(
     description="Simple API to search medication availability in pharmacies.",
     version="1.0.0",
 )
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,8 +47,8 @@ pharmacies = [pharmacy_a, pharmacy_b]
 
 @app.get("/")
 def home():
-    """Basic health route so the API has a simple entry point."""
-    return {"message": "Welcome to Pharma-Find API"}
+    """Serve the frontend page."""
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/api/medications/search")

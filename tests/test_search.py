@@ -8,7 +8,8 @@ client = TestClient(app)
 def test_home_route():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["message"] == "Welcome to Pharma-Find API"
+    assert "text/html" in response.headers["content-type"]
+    assert "Pharma-Find" in response.text
 
 
 def test_search_paracetamol():
