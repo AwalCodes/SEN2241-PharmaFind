@@ -35,6 +35,32 @@ def test_get_pharmacies():
     assert len(data["pharmacies"]) >= 1
 
 
+def test_pharmacist_login_success():
+    response = client.post(
+        "/api/pharmacist/login",
+        json={"username": "pharmacist", "password": "pharma123"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["role"] == "Pharmacist"
+
+
+def test_add_pharmacy_success():
+    response = client.post(
+        "/api/pharmacies",
+        json={
+            "pharmacy_name": "CommunityCare Pharmacy",
+            "address": "99 Test Avenue",
+            "medication_name": "Vitamin C",
+            "quantity": 15,
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["message"] == "Pharmacy added"
+    assert data["pharmacy_name"] == "CommunityCare Pharmacy"
+
+
 def test_get_pharmacy_medications():
     response = client.get("/api/pharmacies/1/medications")
     assert response.status_code == 200

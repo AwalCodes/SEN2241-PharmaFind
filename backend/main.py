@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from backend.models import Medication, Pharmacy
+from backend.models import Medication, Pharmacist, Pharmacy
 
 app = FastAPI(
     title="Pharma-Find API",
@@ -33,6 +33,18 @@ class StockUpdateRequest(BaseModel):
     new_quantity: int
 
 
+class PharmacistLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AddPharmacyRequest(BaseModel):
+    pharmacy_name: str
+    address: str
+    medication_name: str
+    quantity: int
+
+
 # In-memory sample data for now (simple for class project step-by-step build).
 pharmacy_a = Pharmacy(1, "CityCare Pharmacy", "12 Main Street")
 pharmacy_a.add_medication(Medication(1, "Paracetamol", 20))
@@ -43,6 +55,26 @@ pharmacy_b.add_medication(Medication(3, "Paracetamol", 6))
 pharmacy_b.add_medication(Medication(4, "Amoxicillin", 12))
 
 pharmacies = [pharmacy_a, pharmacy_b]
+pharmacist_user = Pharmacist(1, "Demo Pharmacist", "pharmacist@pharmafind.com", "CityCare Pharmacy")
+pharmacist_username = "pharmacist"
+pharmacist_password = "pharma123"
+
+
+def get_next_pharmacy_id() -> int:
+    max_id = 0
+    for pharmacy in pharmacies:
+        if pharmacy.pharmacy_id > max_id:
+            max_id = pharmacy.pharmacy_id
+    return max_id + 1
+
+
+def get_next_medication_id() -> int:
+    max_id = 0
+    for pharmacy in pharmacies:
+        for medication in pharmacy.medications:
+            if medication.med_id > max_id:
+                max_id = medication.med_id
+    return max_id + 1
 
 
 @app.get("/")
@@ -89,6 +121,52 @@ def get_pharmacies():
             }
         )
     return {"pharmacies": items}
+
+
+@app.post("/api/pharmacist/login")
+def pharmacist_login(payload: PharmacistLoginRequest):
+    """
+    Very simple login check for class project demo.
+    """
+    if payload.username != pharmacist_username or payload.password != pharmacist_password:
+        raise HTTPException(status_code=401, detail="Invalid pharmacist credentials")
+
+    return {
+        "message": "Login successful",
+        "pharmacist_name": pharmacist_user.name,
+        "role": pharmacist_user.get_role(),
+    }
+
+
+@app.post("/api/pharmacies")
+def add_pharmacy(payload: AddPharmacyRequest):
+    """
+    Add a new pharmacy and one initial medication.
+    """
+    if payload.quantity < 0:
+        raise HTTPException(status_code=400, detail="Quantity cannot be negative")
+
+    new_pharmacy = Pharmacy(
+        get_next_pharmacy_id(),
+        payload.pharmacy_name.strip(),
+        payload.address.strip(),
+    )
+    new_medication = Medication(
+        get_next_medication_id(),
+        payload.medication_name.strip(),
+        payload.quantity,
+    )
+    new_pharmacy.add_medication(new_medication)
+    pharmacies.append(new_pharmacy)
+
+    return {
+        "message": "Pharmacy added",
+        "pharmacy_id": new_pharmacy.pharmacy_id,
+        "pharmacy_name": new_pharmacy.name,
+        "address": new_pharmacy.address,
+        "first_medication": new_medication.name,
+        "quantity": new_medication.quantity,
+    }
 
 
 @app.get("/api/pharmacies/{pharmacy_id}/medications")

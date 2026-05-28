@@ -1,7 +1,12 @@
 const API_BASE = window.location.origin;
 
+const loginForm = document.getElementById("login-form");
+const loginCard = document.getElementById("login-card");
+const dashboard = document.getElementById("dashboard");
+const loginResult = document.getElementById("login-result");
 const searchForm = document.getElementById("search-form");
 const stockForm = document.getElementById("stock-form");
+const addPharmacyForm = document.getElementById("add-pharmacy-form");
 const viewMedsForm = document.getElementById("view-meds-form");
 const refreshBtn = document.getElementById("refresh-btn");
 const stockPharmacySelect = document.getElementById("stock-pharmacy-id");
@@ -9,6 +14,7 @@ const stockMedicationSelect = document.getElementById("stock-med-name");
 const viewPharmacySelect = document.getElementById("view-pharmacy-id");
 const searchResult = document.getElementById("search-result");
 const stockResult = document.getElementById("stock-result");
+const addPharmacyResult = document.getElementById("add-pharmacy-result");
 const pharmacyList = document.getElementById("pharmacy-list");
 const pharmacyMedsResult = document.getElementById("pharmacy-meds-result");
 
@@ -56,6 +62,42 @@ async function loadPharmacies() {
     pharmacyList.textContent = "Error loading pharmacies.";
   }
 }
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const username = document.getElementById("login-username").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  loginResult.textContent = "Checking login...";
+  loginResult.className = "message-box";
+
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacist/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      loginResult.textContent = data.detail || "Login failed";
+      loginResult.className = "message-box message-error";
+      return;
+    }
+
+    loginResult.textContent = `Welcome ${data.pharmacist_name}`;
+    loginResult.className = "message-box message-success";
+    loginCard.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    await loadPharmacies();
+  } catch (error) {
+    loginResult.textContent = "Error checking login";
+    loginResult.className = "message-box message-error";
+  }
+});
 
 async function loadStockMedications(pharmacyId) {
   stockMedicationSelect.innerHTML = "";
@@ -152,6 +194,49 @@ stockForm.addEventListener("submit", async (event) => {
   }
 });
 
+addPharmacyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const pharmacy_name = document.getElementById("new-pharmacy-name").value.trim();
+  const address = document.getElementById("new-pharmacy-address").value.trim();
+  const medication_name = document.getElementById("new-pharmacy-medication").value.trim();
+  const quantity = Number(document.getElementById("new-pharmacy-quantity").value);
+
+  addPharmacyResult.textContent = "Adding pharmacy...";
+  addPharmacyResult.className = "message-box";
+
+  try {
+    const response = await fetch(`${API_BASE}/api/pharmacies`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pharmacy_name,
+        address,
+        medication_name,
+        quantity,
+      }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      addPharmacyResult.textContent = data.detail || "Failed to add pharmacy";
+      addPharmacyResult.className = "message-box message-error";
+      return;
+    }
+
+    addPharmacyResult.textContent = `Added ${data.pharmacy_name} successfully`;
+    addPharmacyResult.className = "message-box message-success";
+    addPharmacyForm.reset();
+    document.getElementById("new-pharmacy-quantity").value = "10";
+    await loadPharmacies();
+  } catch (error) {
+    addPharmacyResult.textContent = "Error adding pharmacy";
+    addPharmacyResult.className = "message-box message-error";
+  }
+});
+
 viewMedsForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const pharmacyId = viewPharmacySelect.value;
@@ -188,4 +273,3 @@ stockPharmacySelect.addEventListener("change", async () => {
 });
 
 refreshBtn.addEventListener("click", loadPharmacies);
-loadPharmacies();
