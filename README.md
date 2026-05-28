@@ -12,3 +12,9 @@ Simple final project for SEN2241.
    `uvicorn main:app --reload`
 4. Open Swagger docs:
    `http://127.0.0.1:8000/docs`
+
+## Run tests
+
+1. Go to project root folder.
+2. Run:
+   `pytest`
