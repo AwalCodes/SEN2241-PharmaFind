@@ -46,17 +46,65 @@ class AddPharmacyRequest(BaseModel):
     quantity: int
 
 
-# In-memory sample data for now (simple for class project step-by-step build).
-pharmacy_a = Pharmacy(1, "CityCare Pharmacy", "12 Main Street")
-pharmacy_a.add_medication(Medication(1, "Paracetamol", 20))
-pharmacy_a.add_medication(Medication(2, "Ibuprofen", 0))
+# Demo data: 15 pharmacies in Yaounde with common medicines and stock levels.
+DEMO_PHARMACIES = [
+    ("Pharmacie du Centre", "Avenue Kennedy, Bastos, Yaounde", [
+        ("Paracetamol", 80), ("Ibuprofen", 55), ("Amoxicillin", 40), ("Vitamin C", 60), ("Omeprazole", 25),
+    ]),
+    ("Pharmacie Mokolo", "Marché Mokolo, Yaounde", [
+        ("Paracetamol", 120), ("Metronidazole", 35), ("Ciprofloxacin", 28), ("Aspirin", 50), ("Cetirizine", 22),
+    ]),
+    ("Pharmacie Essos", "Carrefour Essos, Yaounde", [
+        ("Paracetamol", 45), ("Ibuprofen", 0), ("Amoxicillin", 30), ("Diclofenac", 18), ("Metformin", 40),
+    ]),
+    ("Pharmacie Melen", "Rue Melen, Yaounde", [
+        ("Paracetamol", 65), ("Artemether-Lumefantrine", 20), ("Chloroquine", 15), ("Vitamin C", 70), ("Amlodipine", 12),
+    ]),
+    ("Pharmacie Obili", "Quartier Obili, Yaounde", [
+        ("Paracetamol", 90), ("Ibuprofen", 42), ("Omeprazole", 30), ("Cetirizine", 35), ("Amoxicillin", 25),
+    ]),
+    ("Pharmacie Emana", "Boulevard du 20 Mai, Emana, Yaounde", [
+        ("Paracetamol", 55), ("Metronidazole", 40), ("Ciprofloxacin", 32), ("Aspirin", 28), ("Vitamin C", 45),
+    ]),
+    ("Pharmacie Mendong", "Carrefour Mendong, Yaounde", [
+        ("Paracetamol", 38), ("Ibuprofen", 20), ("Amoxicillin", 0), ("Metformin", 50), ("Amlodipine", 18),
+    ]),
+    ("Pharmacie Nlongkak", "Avenue Nlongkak, Yaounde", [
+        ("Paracetamol", 72), ("Diclofenac", 33), ("Omeprazole", 27), ("Cetirizine", 40), ("Ibuprofen", 48),
+    ]),
+    ("Pharmacie Mvan", "Entrée Mvan, Yaounde", [
+        ("Paracetamol", 100), ("Amoxicillin", 55), ("Metronidazole", 38), ("Vitamin C", 80), ("Aspirin", 35),
+    ]),
+    ("Pharmacie Emombo", "Rue Emombo, Yaounde", [
+        ("Paracetamol", 28), ("Ibuprofen", 15), ("Artemether-Lumefantrine", 12), ("Chloroquine", 8), ("Ciprofloxacin", 20),
+    ]),
+    ("Pharmacie Tsinga", "Carrefour Tsinga, Yaounde", [
+        ("Paracetamol", 60), ("Amoxicillin", 45), ("Metformin", 30), ("Amlodipine", 22), ("Omeprazole", 18),
+    ]),
+    ("Pharmacie Odza", "Avenue Odza, Yaounde", [
+        ("Paracetamol", 85), ("Ibuprofen", 50), ("Cetirizine", 25), ("Diclofenac", 30), ("Vitamin C", 55),
+    ]),
+    ("Pharmacie Nkolbisson", "Campus Nkolbisson, Yaounde", [
+        ("Paracetamol", 40), ("Amoxicillin", 35), ("Metronidazole", 28), ("Aspirin", 42), ("Ciprofloxacin", 15),
+    ]),
+    ("Pharmacie Ekounou", "Marché Ekounou, Yaounde", [
+        ("Paracetamol", 95), ("Ibuprofen", 60), ("Omeprazole", 35), ("Metformin", 45), ("Amlodipine", 20),
+    ]),
+    ("Pharmacie Ntoussi", "Quartier Ntoussi, Yaounde", [
+        ("Paracetamol", 50), ("Artemether-Lumefantrine", 18), ("Chloroquine", 10), ("Vitamin C", 65), ("Amoxicillin", 38),
+    ]),
+]
 
-pharmacy_b = Pharmacy(2, "HealthPlus Pharmacy", "48 Queen Avenue")
-pharmacy_b.add_medication(Medication(3, "Paracetamol", 6))
-pharmacy_b.add_medication(Medication(4, "Amoxicillin", 12))
+pharmacies: list[Pharmacy] = []
+_next_med_id = 1
+for pharmacy_id, (name, address, medications) in enumerate(DEMO_PHARMACIES, start=1):
+    pharmacy = Pharmacy(pharmacy_id, name, address)
+    for med_name, quantity in medications:
+        pharmacy.add_medication(Medication(_next_med_id, med_name, quantity))
+        _next_med_id += 1
+    pharmacies.append(pharmacy)
 
-pharmacies = [pharmacy_a, pharmacy_b]
-pharmacist_user = Pharmacist(1, "Demo Pharmacist", "pharmacist@pharmafind.com", "CityCare Pharmacy")
+pharmacist_user = Pharmacist(1, "Dr. Marie Nguema", "pharmacist@pharmafind.cm", "Pharmacie du Centre")
 pharmacist_username = "pharmacist"
 pharmacist_password = "pharma123"
 pharmacist_tokens: set[str] = set()
