@@ -3,6 +3,7 @@ const API_BASE = window.location.origin;
 const pharmacistLoginBtn = document.getElementById("pharmacist-login-btn");
 const closeLoginBtn = document.getElementById("close-login-btn");
 const loginModal = document.getElementById("login-modal");
+const pharmacistDashboard = document.getElementById("pharmacist-dashboard");
 const loginStatus = document.getElementById("login-status");
 const loginForm = document.getElementById("login-form");
 const loginResult = document.getElementById("login-result");
@@ -113,6 +114,10 @@ loginForm.addEventListener("submit", async (event) => {
     loginResult.textContent = "Login successful.";
     loginResult.className = "message-box message-success";
     loginModal.classList.add("hidden");
+    pharmacistDashboard.classList.remove("hidden");
+    pharmacistLoginBtn.textContent = "Logged In";
+    pharmacistLoginBtn.disabled = true;
+    await loadPharmacies();
   } catch (error) {
     loginResult.textContent = "Error checking login";
     loginResult.className = "message-box message-error";
@@ -145,12 +150,6 @@ searchForm.addEventListener("submit", async (event) => {
 
 stockForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!pharmacistToken) {
-    stockResult.textContent = "Please login as pharmacist first.";
-    stockResult.className = "message-box message-error";
-    openLoginModal();
-    return;
-  }
   const pharmacyId = stockPharmacySelect.value;
   const medicationName = stockMedicationSelect.value;
   const newQuantity = Number(document.getElementById("new-qty").value);
@@ -183,13 +182,6 @@ stockForm.addEventListener("submit", async (event) => {
 
 addPharmacyForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!pharmacistToken) {
-    addPharmacyResult.textContent = "Please login as pharmacist first.";
-    addPharmacyResult.className = "message-box message-error";
-    openLoginModal();
-    return;
-  }
-
   const pharmacy_name = document.getElementById("new-pharmacy-name").value.trim();
   const address = document.getElementById("new-pharmacy-address").value.trim();
   const medication_name = document.getElementById("new-pharmacy-medication").value.trim();
