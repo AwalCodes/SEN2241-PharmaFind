@@ -1,12 +1,16 @@
 const API_BASE = window.location.origin;
 
 const pharmacistLoginBtn = document.getElementById("pharmacist-login-btn");
+const logoutBtn = document.getElementById("logout-btn");
 const closeLoginBtn = document.getElementById("close-login-btn");
 const loginModal = document.getElementById("login-modal");
-const pharmacistDashboard = document.getElementById("pharmacist-dashboard");
 const loginStatus = document.getElementById("login-status");
 const loginForm = document.getElementById("login-form");
 const loginResult = document.getElementById("login-result");
+const tabCustomer = document.getElementById("tab-customer");
+const tabPharmacist = document.getElementById("tab-pharmacist");
+const customerView = document.getElementById("customer-view");
+const pharmacistView = document.getElementById("pharmacist-view");
 const searchForm = document.getElementById("search-form");
 const stockForm = document.getElementById("stock-form");
 const addPharmacyForm = document.getElementById("add-pharmacy-form");
@@ -32,6 +36,30 @@ function openLoginModal() {
   loginResult.textContent = "";
   loginResult.className = "message-box";
   loginModal.classList.remove("hidden");
+}
+
+function showCustomerView() {
+  tabCustomer.classList.add("active");
+  tabPharmacist.classList.remove("active");
+  customerView.classList.remove("hidden");
+  pharmacistView.classList.add("hidden");
+}
+
+function showPharmacistView() {
+  tabCustomer.classList.remove("active");
+  tabPharmacist.classList.add("active");
+  customerView.classList.add("hidden");
+  pharmacistView.classList.remove("hidden");
+}
+
+function logout() {
+  pharmacistToken = null;
+  loginStatus.textContent = "Not logged in";
+  pharmacistLoginBtn.classList.remove("hidden");
+  logoutBtn.classList.add("hidden");
+  tabPharmacist.classList.add("hidden");
+  loginForm.reset();
+  showCustomerView();
 }
 
 async function loadPharmacies() {
@@ -66,7 +94,9 @@ async function loadPharmacies() {
       viewPharmacySelect.appendChild(v);
     }
 
-    await loadStockMedications(stockPharmacySelect.value);
+    if (pharmacistToken) {
+      await loadStockMedications(stockPharmacySelect.value);
+    }
   } catch (error) {
     pharmacyList.textContent = "Error loading pharmacies.";
   }
@@ -114,10 +144,11 @@ loginForm.addEventListener("submit", async (event) => {
     loginResult.textContent = "Login successful.";
     loginResult.className = "message-box message-success";
     loginModal.classList.add("hidden");
-    pharmacistDashboard.classList.remove("hidden");
-    pharmacistLoginBtn.textContent = "Logged In";
-    pharmacistLoginBtn.disabled = true;
+    pharmacistLoginBtn.classList.add("hidden");
+    logoutBtn.classList.remove("hidden");
+    tabPharmacist.classList.remove("hidden");
     await loadPharmacies();
+    showPharmacistView();
   } catch (error) {
     loginResult.textContent = "Error checking login";
     loginResult.className = "message-box message-error";
@@ -246,5 +277,8 @@ stockPharmacySelect.addEventListener("change", async () => {
 });
 pharmacistLoginBtn.addEventListener("click", openLoginModal);
 closeLoginBtn.addEventListener("click", () => loginModal.classList.add("hidden"));
+logoutBtn.addEventListener("click", logout);
+tabCustomer.addEventListener("click", showCustomerView);
+tabPharmacist.addEventListener("click", showPharmacistView);
 refreshBtn.addEventListener("click", loadPharmacies);
 loadPharmacies();

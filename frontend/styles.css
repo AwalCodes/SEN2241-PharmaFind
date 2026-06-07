@@ -16,13 +16,58 @@ body {
 }
 
 .page-header {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .top-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  border-bottom: -2px solid #e5e7eb;
+}
+
+.tab-btn {
+  background: transparent;
+  color: #4b5563;
+  border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 16px;
+}
+
+.tab-btn.active {
+  color: #1d4ed8;
+  border-bottom-color: #2563eb;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.view-panel {
+  margin-top: 16px;
+}
+
+.panel-banner {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.scroll-table {
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 h1 {
@@ -136,10 +181,6 @@ button:hover {
 
 .modal:not(.hidden) {
   display: flex;
-}
-
-#pharmacist-dashboard {
-  margin-top: 16px;
 }
 
 .modal-content {

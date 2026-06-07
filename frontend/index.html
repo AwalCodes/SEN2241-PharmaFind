@@ -9,15 +9,24 @@
   <body>
     <main class="container">
       <header class="page-header">
-        <h1>Pharma-Find</h1>
-        <p class="subtitle">Search medicine availability in nearby pharmacies.</p>
-        <div class="top-actions">
-          <button id="pharmacist-login-btn" type="button">Pharmacist Login</button>
-          <span id="login-status" class="hint-text">Not logged in</span>
+        <div class="header-row">
+          <div>
+            <h1>Pharma-Find</h1>
+            <p class="subtitle">Search medicine availability in nearby pharmacies.</p>
+          </div>
+          <div class="top-actions">
+            <button id="pharmacist-login-btn" type="button">Pharmacist Login</button>
+            <button id="logout-btn" type="button" class="secondary-btn hidden">Logout</button>
+            <span id="login-status" class="hint-text">Not logged in</span>
+          </div>
         </div>
+
+        <nav class="tab-nav">
+          <button id="tab-customer" type="button" class="tab-btn active">Find Medicine</button>
+          <button id="tab-pharmacist" type="button" class="tab-btn hidden">Pharmacist Panel</button>
+        </nav>
       </header>
 
-      <!-- Login modal: hidden by default, only opens on button click -->
       <div id="login-modal" class="modal hidden">
         <div class="modal-content">
           <h2>Pharmacist Login</h2>
@@ -35,75 +44,84 @@
         </div>
       </div>
 
-      <!-- Public dashboard: always visible -->
-      <div class="grid-layout" id="public-dashboard">
+      <!-- Customer view -->
+      <div id="customer-view" class="view-panel">
         <section class="card card-wide">
           <div class="card-top">
             <h2>All Pharmacies</h2>
             <button id="refresh-btn" type="button">Refresh</button>
           </div>
-          <div id="pharmacy-list"></div>
+          <div id="pharmacy-list" class="scroll-table"></div>
         </section>
 
-        <section class="card">
-          <h2>Search Medication</h2>
-          <form id="search-form">
-            <label for="med-name">Medication name</label>
-            <input id="med-name" type="text" placeholder="Paracetamol" required />
-            <button type="submit">Search</button>
-          </form>
-          <div id="search-result"></div>
-        </section>
+        <div class="grid-layout">
+          <section class="card">
+            <h2>Search Medication</h2>
+            <form id="search-form">
+              <label for="med-name">Medication name</label>
+              <input id="med-name" type="text" placeholder="Paracetamol" required />
+              <button type="submit">Search</button>
+            </form>
+            <div id="search-result"></div>
+          </section>
 
-        <section class="card">
-          <h2>Medications in Selected Pharmacy</h2>
-          <form id="view-meds-form">
-            <label for="view-pharmacy-id">Pharmacy</label>
-            <select id="view-pharmacy-id" required></select>
-            <button type="submit">View Medications</button>
-          </form>
-          <div id="pharmacy-meds-result"></div>
-        </section>
+          <section class="card">
+            <h2>Medications in Selected Pharmacy</h2>
+            <form id="view-meds-form">
+              <label for="view-pharmacy-id">Pharmacy</label>
+              <select id="view-pharmacy-id" required></select>
+              <button type="submit">View Medications</button>
+            </form>
+            <div id="pharmacy-meds-result"></div>
+          </section>
+        </div>
       </div>
 
-      <!-- Pharmacist dashboard: only visible after login -->
-      <div class="grid-layout hidden" id="pharmacist-dashboard">
-        <section class="card">
-          <h2>Update Stock</h2>
-          <form id="stock-form">
-            <label for="stock-pharmacy-id">Pharmacy</label>
-            <select id="stock-pharmacy-id" required></select>
-
-            <label for="stock-med-name">Medication</label>
-            <select id="stock-med-name" required></select>
-
-            <label for="new-qty">New quantity</label>
-            <input id="new-qty" type="number" min="0" value="20" required />
-
-            <button type="submit">Update Stock</button>
-          </form>
-          <div id="stock-result" class="message-box"></div>
+      <!-- Pharmacist view: separate tab, only after login -->
+      <div id="pharmacist-view" class="view-panel hidden">
+        <section class="card card-wide panel-banner">
+          <h2>Pharmacist Dashboard</h2>
+          <p class="hint-text">Manage stock levels and register new pharmacies.</p>
         </section>
 
-        <section class="card">
-          <h2>Add New Pharmacy</h2>
-          <form id="add-pharmacy-form">
-            <label for="new-pharmacy-name">Pharmacy name</label>
-            <input id="new-pharmacy-name" type="text" placeholder="NewCare Pharmacy" required />
+        <div class="grid-layout">
+          <section class="card">
+            <h2>Update Stock</h2>
+            <form id="stock-form">
+              <label for="stock-pharmacy-id">Pharmacy</label>
+              <select id="stock-pharmacy-id" required></select>
 
-            <label for="new-pharmacy-address">Location / Address</label>
-            <input id="new-pharmacy-address" type="text" placeholder="22 King Street" required />
+              <label for="stock-med-name">Medication</label>
+              <select id="stock-med-name" required></select>
 
-            <label for="new-pharmacy-medication">First medication</label>
-            <input id="new-pharmacy-medication" type="text" placeholder="Vitamin C" required />
+              <label for="new-qty">New quantity</label>
+              <input id="new-qty" type="number" min="0" value="20" required />
 
-            <label for="new-pharmacy-quantity">First quantity</label>
-            <input id="new-pharmacy-quantity" type="number" min="0" value="10" required />
+              <button type="submit">Update Stock</button>
+            </form>
+            <div id="stock-result" class="message-box"></div>
+          </section>
 
-            <button type="submit">Add Pharmacy</button>
-          </form>
-          <div id="add-pharmacy-result" class="message-box"></div>
-        </section>
+          <section class="card">
+            <h2>Add New Pharmacy</h2>
+            <form id="add-pharmacy-form">
+              <label for="new-pharmacy-name">Pharmacy name</label>
+              <input id="new-pharmacy-name" type="text" placeholder="NewCare Pharmacy" required />
+
+              <label for="new-pharmacy-address">Location / Address</label>
+              <input id="new-pharmacy-address" type="text" placeholder="22 King Street, Yaounde" required />
+
+              <label for="new-pharmacy-medication">First medication</label>
+              <input id="new-pharmacy-medication" type="text" placeholder="Vitamin C" required />
+
+              <label for="new-pharmacy-quantity">First quantity</label>
+              <input id="new-pharmacy-quantity" type="number" min="0" value="10" required />
+
+              <button type="submit">Add Pharmacy</button>
+            </form>
+            <div id="add-pharmacy-result" class="message-box"></div>
+          </section>
+        </div>
       </div>
     </main>
 
